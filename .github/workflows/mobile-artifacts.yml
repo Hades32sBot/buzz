@@ -63,9 +63,9 @@ jobs:
         run: cd mobile && flutter build ios --no-codesign
       - name: Package Runner.app
         run: |
-          app_dir="$(find mobile/build/ios -name 'Runner.app' -type d | head -1)"
-          [ -n "$app_dir" ] || { echo 'Runner.app not found'; exit 1; }
-          (cd "$(dirname "$app_dir")" && zip -qr "$GITHUB_WORKSPACE/runner-app.zip" Runner.app)
+          app_dir="$(find mobile/build/ios -name '*.app' -type d | grep -v -i sim | head -1)"
+          [ -n "$app_dir" ] || { echo '*.app not found'; exit 1; }
+          (cd "$(dirname "$app_dir")" && zip -qr "$GITHUB_WORKSPACE/runner-app.zip" "$(basename "$app_dir")")
       - uses: actions/upload-artifact@v4
         with:
           name: buzz-ios-runner-app-unsigned
@@ -79,9 +79,9 @@ jobs:
         if: always()
         continue-on-error: true
         run: |
-          app_dir="$(find mobile/build/ios -name 'Runner.app' -type d | grep -i sim | head -1)"
+          app_dir="$(find mobile/build/ios -name '*.app' -type d | grep -i sim | head -1)"
           [ -n "$app_dir" ] || exit 0
-          (cd "$(dirname "$app_dir")" && zip -qr "$GITHUB_WORKSPACE/runner-simulator.zip" Runner.app)
+          (cd "$(dirname "$app_dir")" && zip -qr "$GITHUB_WORKSPACE/runner-simulator.zip" "$(basename "$app_dir")")
       - uses: actions/upload-artifact@v4
         with:
           name: buzz-ios-simulator-app
